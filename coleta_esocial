@@ -5,12 +5,21 @@ import pyautogui as pa
 import time
 import clipboard
 
-empresa = 'SALARINOX'
+########################################################################################################
 
+# Definição da empresa cliente (nome deve ser igual ao do arquivo com os dados dos funcionários)
+empresa = 'EMPRESA CLIENTE'
+
+########################################################################################################
+
+# Criação das váriaveis onde serão armazenados os dados de cada funcionário
 matricula = ''
 situacao = ''
 admissao = ''
 
+########################################################################################################
+
+# Criação das váriaveis onde serão armazenados os dados de todos os funcionário
 pmatricula = []
 psituacao = []
 padmissao = []
@@ -18,6 +27,10 @@ pcpf = []
 pnome = []
 pcod = []
 
+########################################################################################################
+
+# função para abrir o navegador (já logado dentro do CNPJ da empresa cliente na plataforma do eSocial),
+# inserir o cpf do funcionário no campo de busca, e acessar os dados do funcionário 
 
 def abrir_esocial():
     pa.moveTo(220, 1005)
@@ -37,7 +50,9 @@ def abrir_esocial():
     pcpf.append(cpf.value)
     pnome.append(nome.value)
     pcod.append(cod.value)
-
+    
+########################################################################################################
+# função para copiar a matricula do funcionário e salvar na variável de matrícula
 
 def copy_matricula():
     time.sleep(1)
@@ -51,6 +66,9 @@ def copy_matricula():
     print(matricula)
     pmatricula.append(matricula)
 
+########################################################################################################
+# função para copiar a situação da contratação (ativo, desligado ou afastado) do funcionário 
+# e salvar na variável de situação
 
 def copy_situacao():
     time.sleep(1)
@@ -64,6 +82,8 @@ def copy_situacao():
     print(situacao)
     psituacao.append(situacao)
 
+########################################################################################################
+# função para copiar a data de admissão do funcionário e salvar na variável admissão 
 
 def copy_admissao():
     time.sleep(1)
@@ -77,12 +97,16 @@ def copy_admissao():
     print(admissao)
     padmissao.append(admissao)
 
+########################################################################################################
+# função para sair da tela do eSocial para que não de conflito na função de abrir dentro do loop 
 
 def fecha_esocial():
     pa.moveTo(220, 1005)
     pa.leftClick()
     time.sleep(1)
 
+########################################################################################################
+# função para criar a planilha com todos os dados coletados dos funcionários 
 
 def criacao_planilha():
     modelo1 = Workbook()
@@ -127,12 +151,18 @@ def criacao_planilha():
 
     modelo1.save(rf'C:\Users\desenvolvimento02\Desktop\modelo1_pos_matric\modelo1_{empresa}_pos.xlsx')
 
+########################################################################################################
+# início da aplicação
+
+########################################################################################################
 # abrir modelo1 da empresa
 
 wb = load_workbook(rf'C:\Users\desenvolvimento02\Desktop\modelo1_pre_matric\modelo1_{empresa}_pre.xlsx')
 ws = wb.active
 
-# extrair os cpfs para uma linha (coluna T da modelo1)
+########################################################################################################
+# extrair os cpfs, nome e codigo (do sistema SOC onde esses dados são cadastrados)
+# para cada linha da planilha (coluna T da planilha)
 
 linhas = ws.max_row
 x = 2
@@ -140,7 +170,15 @@ while x < (linhas + 3):
     cpf = ws[f'T{x}']
     nome = ws[f'I{x}']
     cod = ws[f'H{x}']
-    if cpf.value is not None:
+    
+########################################################################################################
+    # excluindo os funcionários sem CPF
+
+    if cpf.value is not None:      
+    
+########################################################################################################
+        # execução das funções
+        
         abrir_esocial()
         copy_matricula()
         copy_admissao()
@@ -148,6 +186,5 @@ while x < (linhas + 3):
         fecha_esocial()
         print(cpf.value)
     x += 1
-
 criacao_planilha()
 print(f'{empresa} - FIM')
