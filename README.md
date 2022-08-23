@@ -6,4 +6,6 @@ Como por conta de uma procuração temos acesso as informações de SST das empr
 
 Então, para atualizar o banco de dados do sistema que utilizamos para esses envios SOC, fiz uma automação para coleta de número de matrícula, situação do contrato e data de admissão dos funcionários a partir do CPF desses funcionários (que é cadastrado pelo cliente no SOC).
 
-Para isso faço a extração de um planilha de informações dos funcionários cadastrados no sistema (chamada modelo1), leio essses dados com o <b>openpyxl</b> 
+Para isso faço a extração de um planilha de informações dos funcionários cadastrados no sistema (chamada modelo1), leio essses dados com a biblioteca <b>openpyxl</b>, e utilizo a biblioteca <b>pyautoGUI</b> para automatizar a coleta desses dados na plataforma do governo do eSocial, após á coleta crio uma planilha com a relação dos dados coletados da plataforma do governo do eSocial e do SOC.
+
+Após isso utilizo a modelo padrão de importação do sistema para atualizar os dados do funcionários.
