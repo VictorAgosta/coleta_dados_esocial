@@ -1,154 +1,153 @@
+# Coleta de informações no eSocial a partir dos CPFs da modelo1
+import re
+from openpyxl import *
 import pyautogui as pa
-import clipboard
 import time
-import pandas as pd
-from os import chdir, getcwd, listdir
-from os.path import isfile
+import clipboard
 
-## Deixar o gmail aberto e logado no chrome ##
+empresa = 'SALARINOX'
 
-caminho = r'X:\e-Social\teste_envio_recibos'
+matricula = ''
+situacao = ''
+admissao = ''
 
-# função para criar a lista dos arquivos para serem enviados para as empresas
-def criar_lista():
-    chdir(caminho)
-    print(getcwd())
+pmatricula = []
+psituacao = []
+padmissao = []
+pcpf = []
+pnome = []
+pcod = []
 
-    tabela = []
 
-    for c in listdir():
-        if isfile(c):
-            tabela.append(c)
-
-    dataframe = pd.DataFrame(tabela, columns=['arquivos'])
-    dataframe.to_excel(rf'{caminho}\lista_recibos.xlsx', index=False)
-
-# função para abrir navegador(x=220, y=1006)
-
-def abrir_navegador():
-    pa.moveTo(220, 1006)
-    pa.leftClick()
-
-# função para clicar em mensagem(x=74, y=211)
-
-def clicar_mensagem():
-    pa.moveTo(74, 211)
-    pa.leftClick()
-
-# função para escrever o email
-
-def escrever_email():
-    assunto = f'Recibos eSocial - {nome_v}'
-
-    corpo_email = f'''Boa tarde,
-
-Sou da equipe de desenvolvimento do Inmestra, responsável pelos envios ao eSocial.
-
-Estamos entrando em contato para o envio dos comprovantes dos eventos do eSocial da empresa {nome_v}.
-
-Segue em anexo o arquivo com os números dos recibos.
-
-Qualquer dúvida estamos à disposição através do email suporteesocial@inmestra.com.br.
-Obrigado!
-'''
-
-    # colar o destinatário
-    clipboard.copy(email_v)
-    pa.hotkey('ctrl', 'v')
-    pa.press('tab')
-    time.sleep(1)
-
-    # colar o assunto
-    clipboard.copy(assunto)
-    pa.hotkey('ctrl', 'v')
-    pa.press('tab')
-    time.sleep(1)
-
-    # colar o corpo do email
-    clipboard.copy(corpo_email)
-    pa.hotkey('ctrl', 'v')
-    time.sleep(1)
-
-    # clicar no anexo(x=777, y=951)
-    pa.moveTo(777, 951)
+def abrir_esocial():
+    pa.moveTo(220, 1005)
     pa.leftClick()
     time.sleep(1)
-
-    # colar o caminho do arquivo e dar enter
-    clipboard.copy(rf'{caminho}\{anexo_v}')
+    pa.press('f5')
+    time.sleep(1)
+    pa.moveTo(180, 409)  # clica no lugar de digitar
+    pa.leftClick()
+    pa.leftClick()
+    pa.leftClick()
+    clipboard.copy(cpf.value)
     pa.hotkey('ctrl', 'v')
-    time.sleep(0.5)
+    time.sleep(3)
     pa.press('enter')
-    time.sleep(5)
+    time.sleep(2)
+    pcpf.append(cpf.value)
+    pnome.append(nome.value)
+    pcod.append(cod.value)
 
-    # enviar o email (ctrl + enter)
-    pa.hotkey('ctrl', 'enter')
 
-
-criar_lista()
-lista_plan_recibos = pd.read_excel(rf'{caminho}\lista_recibos.xlsx')
-lista_plan_email = pd.read_excel(rf'X:\e-Social\dados\codigo_email.xlsx')
-
-nome = []
-anexo = []
-cod = []
-email = []
-
-# definição das variaveis a partir da lista de arquivos para serem enviados
-for arquivo in lista_plan_recibos['arquivos']:
-
-    # Desconsiderar o arquivo da lista de arquivos e do nome das empresas
-    if arquivo == 'lista_recibos.xlsx':
-        continue
-    if arquivo == 'nomes_empresas.xlsx':
-        continue
-
-    # Definição dos nomes das empresas baseado nos nomes dos arquivos
-    nome_arquivo_l = arquivo.split('_')
-    nome_empresa = nome_arquivo_l[3]
-    cod_empresa = nome_arquivo_l[2]
-    cod.append(cod_empresa)
-    nome.append(nome_empresa)
-    anexo.append(arquivo)
-
-for codigo in cod:
-    indice_1 = lista_plan_email[lista_plan_email['cod'] == int(codigo)].index
-    email_valores = lista_plan_email['email'].values[indice_1]
-    email_string = str(email_valores)
-    fim = (len(email_string) - 2)
-    email_empresa = email_string[2:fim]
-    email.append(email_empresa)
-
-dit = {'cod': cod, 'nome': nome, 'anexo': anexo, 'email': email}
-
-dit_df = pd.DataFrame(dit)
-dit_df.to_excel(rf'{caminho}\nomes_empresas.xlsx', index=False)
-
-###### inicio da automação do email ######
-
-planilha = pd.read_excel(rf'{caminho}\nomes_empresas.xlsx')
-
-abrir_navegador()
-
-for empresa in planilha['cod']:
-    indice_2 = planilha[planilha['cod'] == int(empresa)].index
-
-    nome_array = planilha['nome'].values[indice_2]
-    nome_string = str(nome_array)
-    fim = (len(nome_string) - 2)
-    nome_v = nome_string[2:fim]
-
-    anexo_array = planilha['anexo'].values[indice_2]
-    anexo_string = str(anexo_array)
-    fim = (len(anexo_string) - 2)
-    anexo_v = anexo_string[2:fim]
-
-    email_array = planilha['email'].values[indice_2]
-    email_string = str(email_array)
-    fim = (len(email_string) - 2)
-    email_v = email_string[2:fim]
-
+def copy_matricula():
     time.sleep(1)
-    clicar_mensagem()
+    pa.moveTo(503, 708)
+    pa.leftClick()
+    pa.leftClick()
+    pa.leftClick()
+    pa.hotkey('ctrl', 'c')
+    matricula = clipboard.paste()
+    matricula = re.sub(r'\r\n\r\n', '', matricula)
+    print(matricula)
+    pmatricula.append(matricula)
+
+
+def copy_situacao():
     time.sleep(1)
-    escrever_email()
+    pa.moveTo(197, 709)
+    pa.leftClick()
+    pa.leftClick()
+    pa.leftClick()
+    pa.hotkey('ctrl', 'c')
+    situacao = clipboard.paste()
+    situacao = re.sub(r'\r\n\r\n', '', situacao)
+    print(situacao)
+    psituacao.append(situacao)
+
+
+def copy_admissao():
+    time.sleep(1)
+    pa.moveTo(187, 878)
+    pa.leftClick()
+    pa.leftClick()
+    pa.leftClick()
+    pa.hotkey('ctrl', 'c')
+    admissao = clipboard.paste()
+    admissao = re.sub(r'\r\n\r\n', '', admissao)
+    print(admissao)
+    padmissao.append(admissao)
+
+
+def fecha_esocial():
+    pa.moveTo(220, 1005)
+    pa.leftClick()
+    time.sleep(1)
+
+
+def criacao_planilha():
+    modelo1 = Workbook()
+    m1 = modelo1.active
+    m1['A1'] = 'cod'
+    m1['B1'] = 'Nome'
+    m1['C1'] = 'CPF'
+    m1['D1'] = 'Matricula'
+    m1['E1'] = 'Situação'
+    m1['F1'] = 'Admissão'
+
+    cont1 = 1
+    cont2 = 1
+    cont3 = 1
+    cont4 = 1
+    cont5 = 1
+    cont6 = 1
+
+    for f in pcod:
+        cont6 += 1
+        m1[f'A{cont6}'] = f
+
+    for a in pnome:
+        cont5 += 1
+        m1[f'B{cont5}'] = a
+
+    for b in pcpf:
+        cont1 += 1
+        m1[f'C{cont1}'] = b
+
+    for c in pmatricula:
+        cont2 += 1
+        m1[f'D{cont2}'] = c
+
+    for d in psituacao:
+        cont3 += 1
+        m1[f'E{cont3}'] = d
+
+    for e in padmissao:
+        cont4 += 1
+        m1[f'F{cont4}'] = e
+
+    modelo1.save(rf'C:\Users\desenvolvimento02\Desktop\modelo1_pos_matric\modelo1_{empresa}_pos.xlsx')
+
+# abrir modelo1 da empresa
+
+wb = load_workbook(rf'C:\Users\desenvolvimento02\Desktop\modelo1_pre_matric\modelo1_{empresa}_pre.xlsx')
+ws = wb.active
+
+# extrair os cpfs para uma linha (coluna T da modelo1)
+
+linhas = ws.max_row
+x = 2
+while x < (linhas + 3):
+    cpf = ws[f'T{x}']
+    nome = ws[f'I{x}']
+    cod = ws[f'H{x}']
+    if cpf.value is not None:
+        abrir_esocial()
+        copy_matricula()
+        copy_admissao()
+        copy_situacao()
+        fecha_esocial()
+        print(cpf.value)
+    x += 1
+
+criacao_planilha()
+print(f'{empresa} - FIM')
